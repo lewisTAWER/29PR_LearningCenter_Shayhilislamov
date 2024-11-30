@@ -8,8 +8,6 @@ namespace LearningCenter_Shayhilislamov.ViewModel
 {
     public class VMStudents : INotifyPropertyChanged
     {
-
-
         public ObservableCollection<Students> Items { get; set; }
 
         public Classes.RelayCommand NewItem
@@ -30,17 +28,35 @@ namespace LearningCenter_Shayhilislamov.ViewModel
             }
         }
 
+        // Конструктор, который заполняет коллекцию студентов
         public VMStudents()
         {
-            using CoursesContext coursesContext = new CoursesContext();
-            Items = new ObservableCollection<Students>(
-                StudentsContext.AllStudents()
-                    .Select(x => {
-                        Courses? SelectedCourses = coursesContext.Courses.FirstOrDefault(_courses => _courses.Id == x.CoursesId);
-                        x.Courses = SelectedCourses;
-                        return x;
-                    })
-            );
+            using (CoursesContext coursesContext = new CoursesContext())
+            {
+                // Загружаем студентов и их курсы
+                Items = new ObservableCollection<Students>(
+                    StudentsContext.AllStudents()
+                        .Select(x =>
+                        {
+                            // Получаем курс для студента по ID
+                            Courses? selectedCourse = coursesContext.Courses.FirstOrDefault(c => c.Id == x.CoursesId);
+                            x.Courses = selectedCourse; // Назначаем курс студенту
+                            return x;
+                        }));
+            }
+        }
+
+        // Метод для добавления нового студента в коллекцию и обновления привязки
+        public void AddNewStudent(Students newStudent)
+        {
+            // Загружаем курс для нового студента, если нужно
+            using (CoursesContext coursesContext = new CoursesContext())
+            {
+                newStudent.Courses = coursesContext.Courses.FirstOrDefault(c => c.Id == newStudent.CoursesId);
+            }
+
+            Items.Add(newStudent); // Добавляем нового студента в коллекцию
+            OnPropertyChanged(nameof(Items)); // Уведомляем UI об изменении коллекции
         }
 
 
@@ -48,10 +64,8 @@ namespace LearningCenter_Shayhilislamov.ViewModel
 
         public void OnPropertyChanged([CallerMemberName] string prop = "")
         {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(prop));
-            }
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
         }
+
     }
 }
