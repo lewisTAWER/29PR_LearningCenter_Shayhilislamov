@@ -10,48 +10,53 @@ namespace LearningCenter_Shayhilislamov.Model
 {
     public class Students : INotifyPropertyChanged
     {
+        private Courses? _coursesField;
+
+        public Courses? Courses
+        {
+            get => _coursesField;
+            set
+            {
+                _coursesField = value;
+                // Указываем корректное имя свойства для уведомления
+                OnPropertyChanged(nameof(Courses));
+                OnPropertyChanged(nameof(CoursesTitle));
+            }
+        }
+
+        public string CoursesTitle => Courses?.Title ?? "Не выбран";
+
+        // Остальные свойства остаются без изменений
+        private int _coursesId;
+        public int CoursesId
+        {
+            get => _coursesId;
+            set
+            {
+                _coursesId = value;
+                OnPropertyChanged(nameof(CoursesId));
+            }
+        }
 
         private int _id;
         public int Id
         {
-            get { return _id; }
+            get => _id;
             set
             {
                 _id = value;
-                OnPropertyChanged("_id");
+                OnPropertyChanged(nameof(Id)); // Было OnPropertyChanged("_id")
             }
         }
+
         private string? _name;
         public string? Name
         {
-            get { return _name; }
+            get => _name;
             set
             {
                 _name = value;
-                OnPropertyChanged("_name");
-            }
-        }
-
-
-        private int _coursesId;
-        public int CoursesId
-        {
-            get { return _coursesId; }
-            set
-            {
-                _coursesId = value;
-                OnPropertyChanged("_coursesId");
-            }
-        }
-
-        private Courses? _courses;
-        public Courses? Courses
-        {
-            get { return _courses; }
-            set
-            {
-                _courses = value;
-                OnPropertyChanged("_courses");
+                OnPropertyChanged(nameof(Name)); // Было OnPropertyChanged("_name")
             }
         }
 

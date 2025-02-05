@@ -8,6 +8,18 @@ namespace LearningCenter_Shayhilislamov.ViewModel
 {
     public class VMStudentsAdd : INotifyPropertyChanged
     {
+        private Courses _selectedCourse;
+        public Courses SelectedCourse
+        {
+            get => _selectedCourse;
+            set
+            {
+                _selectedCourse = value;
+                item.CoursesId = value?.Id ?? 0;
+                item.Courses = value; // Непосредственная привязка объекта
+                OnPropertyChanged();
+            }
+        }
         public Students item { get; set; }
         public StudentsContext context { get; set; }
         public ObservableCollection<Courses> courses { get; set; }
@@ -16,7 +28,15 @@ namespace LearningCenter_Shayhilislamov.ViewModel
         {
             item = Item;
             context = Context;
-            courses = new VMCourses().Items;
+
+            // Загружаем курсы из существующего контекста
+            using (var coursesContext = new CoursesContext())
+            {
+                courses = new ObservableCollection<Courses>(coursesContext.Courses.ToList());
+            }
+
+            // Устанавливаем выбранный курс
+            SelectedCourse = courses.FirstOrDefault(c => c.Id == item.CoursesId);
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;

@@ -28,49 +28,49 @@ namespace LearningCenter_Shayhilislamov.Context
         // Метод для сохранения или обновления студента
         public void Save(Students studentsItem, bool isNew)
         {
-            using (StudentsContext context = new())
+            using (var context = new StudentsContext())
             {
+                // Обновляем курс через контекст
+                if (studentsItem.CoursesId > 0)
+                {
+                    studentsItem.Courses = context.Set<Courses>()
+                        .FirstOrDefault(c => c.Id == studentsItem.CoursesId);
+                }
+
                 if (isNew)
                 {
                     context.Students.Add(studentsItem);
                 }
                 else
                 {
-                    context.Students.Update(studentsItem);
+                    context.Entry(studentsItem).State = EntityState.Modified;
                 }
                 context.SaveChanges();
+                // Navigate back to the courses page
+                MainWindow.init?.frame.Navigate(new View.Students.Main());
             }
 
-            // Обновление коллекции студентов
-            VMStudents vmStudents = MainWindow.init.MainStudents.DataContext as VMStudents;
+            // Обновление UI
+            var vmStudents = MainWindow.init.MainStudents.DataContext as VMStudents;
             if (vmStudents != null)
             {
                 if (isNew)
                 {
-                    // Если это новый студент, добавляем его в коллекцию
                     vmStudents.Items.Add(studentsItem);
                 }
                 else
                 {
-                    // Если студент уже существует, обновляем его
-                    var existingStudent = vmStudents.Items.FirstOrDefault(s => s.Id == studentsItem.Id);
-                    if (existingStudent != null)
+                    var existing = vmStudents.Items.FirstOrDefault(s => s.Id == studentsItem.Id);
+                    if (existing != null)
                     {
-                        // Обновляем информацию о студенте в коллекции
-                        existingStudent.Name = studentsItem.Name;
-                        existingStudent.CoursesId = studentsItem.CoursesId;
-                        existingStudent.Courses = studentsItem.Courses;
+                        existing.Name = studentsItem.Name;
+                        existing.CoursesId = studentsItem.CoursesId;
+                        existing.Courses = studentsItem.Courses; // Прямое обновление
                     }
                 }
-
-                vmStudents.OnPropertyChanged(nameof(vmStudents.Items)); // Уведомление UI о изменении коллекции
+                vmStudents.OnPropertyChanged(nameof(vmStudents.Items));
             }
-
-            // Переход на страницу студентов
-            MainWindow.init?.frame.Navigate(new View.Students.Main());
         }
-
-
 
 
         // Метод для удаления студента

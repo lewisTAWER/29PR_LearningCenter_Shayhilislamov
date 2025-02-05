@@ -32,14 +32,15 @@
              VerticalContentAlignment="Center" />
 
             <Label Content="Курс:" VerticalAlignment="Top" Margin="10,67,10,0" Grid.Column="1" />
-            <ComboBox x:Name="cbCourses" 
-                  ItemsSource="{Binding courses}"
-                  DisplayMemberPath="Title"
-                  SelectedValue="{Binding item.CoursesId}"
-                  SelectedValuePath="Id"
-                  Height="25" 
-                  VerticalAlignment="Top" 
-                  Margin="10,93,10,0" VerticalContentAlignment="Center" Grid.Column="1" />
+            <ComboBox 
+                ItemsSource="{Binding courses}"
+                DisplayMemberPath="Title"
+                SelectedItem="{Binding SelectedCourse}"
+                Height="25"
+                VerticalAlignment="Top"
+                Margin="10,93,10,0"
+                VerticalContentAlignment="Center"
+                Grid.Column="1"/>
 
             <Button Content="Сохранить" Width="100" Height="25" Margin="0,0,10,10" VerticalAlignment="Bottom"
             HorizontalAlignment="Right" Grid.Column="1" Command="{Binding context.OnSave}" CommandParameter="{Binding item}" />
